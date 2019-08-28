@@ -30,8 +30,10 @@ jobs:
        - *local_setup
        - checkout
        - run: echo "A first hello"
-#       - run: .ci/build_withStack.sh
+       - run: chmod +x .ci/build_withStack.sh
+       - run: sh ./.ci/build_withStack.sh
        - run: pwd
        - run: ls -la
        - run: ls -la ./.ci
-       - run: cabal new-build
+#       - run: cabal new-build
+#       - run: stack build

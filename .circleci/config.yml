@@ -33,3 +33,5 @@ jobs:
 #       - run: .ci/build_withStack.sh
        - run: pwd
        - run: ls -la
+       - run: ls -la ./.ci
+       - run: cabal new-build

@@ -1,6 +1,6 @@
 version: 2
 
- aliases:
+aliases:
   - &nix_setup
     run:
       name: Installing the 3rd parties ...
@@ -9,7 +9,7 @@ version: 2
         # Circle CI needs git/ssh in /usr/bin
         ln -s $(find /nix -type f -name git | grep libexec | head -n1) /usr/bin
         ln -s $(find /nix -type f -name ssh | grep openssh | head -n1) /usr/bin
- jobs:
+jobs:
    build:
      docker:
        - image: nixos/nix

@@ -31,3 +31,5 @@ jobs:
        - checkout
        - run: echo "A first hello"
        - run: .ci/build_withStack.sh
+       - run: pwd
+       - run: ls -la

@@ -1,13 +1,7 @@
 version: 2
 
 aliases:
-  - &build
-    run:
-      name: Build...
-      command: |
-        echo "Hello build!"
-
-  - &nix_setup
+  - &local_setup
     run:
       name: Installing the 3rd parties ...
       command: |
@@ -29,9 +23,11 @@ aliases:
       - *stack_build
 
 jobs:
-  build:
-    <<: *build
-
-  stack-build:
-    <<: *build_with_stack
-
+   build:
+     docker:
+       - image: nixos/nix
+     steps:
+       - *local_setup
+       - checkout
+       - run: echo "A first hello"
+       - run: .ci/build_withStack.sh

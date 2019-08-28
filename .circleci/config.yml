@@ -1,6 +1,12 @@
 version: 2
 
 aliases:
+  - &build
+    run:
+      name: Build...
+      command: |
+        echo "Hello build!"
+
   - &nix_setup
     run:
       name: Installing the 3rd parties ...
@@ -9,11 +15,23 @@ aliases:
         # Circle CI needs git/ssh in /usr/bin
         ln -s $(find /nix -type f -name git | grep libexec | head -n1) /usr/bin
         ln -s $(find /nix -type f -name ssh | grep openssh | head -n1) /usr/bin
+
+  - &stack_build
+    run:
+      name: Building with haskell-stack ...
+      command: .ci/build_withStack.sh
+
+  - &build_with_stack
+    docker:
+      - image: nixos/nix
+    steps:
+      - checkout
+      - *stack_build
+
 jobs:
-   build:
-     docker:
-       - image: nixos/nix
-     steps:
-       - *nix_setup
-       - checkout
-       - run: echo "A first hello"
+  build:
+    <<: *build
+
+  stack-build:
+    <<: *build_with_stack
+

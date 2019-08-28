@@ -5,7 +5,7 @@ aliases:
     run:
       name: Installing the 3rd parties ...
       command: |
-        nix-env -i git findutils gnugrep coreutils openssh
+        nix-env -i git findutils gnugrep coreutils openssh stack
         # Circle CI needs git/ssh in /usr/bin
         ln -s $(find /nix -type f -name git | grep libexec | head -n1) /usr/bin
         ln -s $(find /nix -type f -name ssh | grep openssh | head -n1) /usr/bin

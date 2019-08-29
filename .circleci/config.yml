@@ -36,4 +36,4 @@ jobs:
        - run: ls -la
        - run: ls -la ./.ci
 #       - run: cabal new-build
-#       - run: stack build
+       - run: stack build

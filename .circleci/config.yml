@@ -5,7 +5,7 @@ aliases:
     run:
       name: Installing the 3rd parties ...
       command: |
-        nix-env -i git findutils gnugrep coreutils openssh stack
+        nix-env -i git findutils gnugrep coreutils openssh stack cabal-install ghc
         # Circle CI needs git/ssh in /usr/bin
         ln -s $(find /nix -type f -name git | grep libexec | head -n1) /usr/bin
         ln -s $(find /nix -type f -name ssh | grep openssh | head -n1) /usr/bin
@@ -35,6 +35,7 @@ jobs:
        - run: pwd
        - run: ls -la
        - run: ls -la ./.ci
-#       - run: cabal new-build
-       - run: wget -qO- https://get.haskellstack.org/ | sh
-       - run: stack build
+#       - run: wget -qO- https://get.haskellstack.org/ | sh
+       - run: sh ./.ci/setup.sh
+#       - run: stack build
+       - run: cabal new-build

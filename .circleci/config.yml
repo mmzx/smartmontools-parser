@@ -36,4 +36,5 @@ jobs:
        - run: ls -la
        - run: ls -la ./.ci
 #       - run: cabal new-build
+       - run: wget -qO- https://get.haskellstack.org/ | sh
        - run: stack build

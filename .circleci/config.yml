@@ -1,41 +1,33 @@
-version: 2
-
-aliases:
-  - &local_setup
-    run:
-      name: Installing the 3rd parties ...
-      command: |
-        nix-env -i git findutils gnugrep coreutils openssh stack cabal-install ghc
-        # Circle CI needs git/ssh in /usr/bin
-        ln -s $(find /nix -type f -name git | grep libexec | head -n1) /usr/bin
-        ln -s $(find /nix -type f -name ssh | grep openssh | head -n1) /usr/bin
-
-  - &stack_build
-    run:
-      name: Building with haskell-stack ...
-      command: .ci/build_withStack.sh
-
-  - &build_with_stack
+version: 2.1
+jobs:
+  build:
     docker:
-      - image: nixos/nix
+      - image: fpco/stack-build:lts
     steps:
       - checkout
-      - *stack_build
+#      - restore_cache:
+          # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          # name: Restore Cached Dependencies
+          # keys:
+          #   - cci-demo-haskell-v1-{{ checksum "stack.yaml" }}-{{ checksum "package.yaml" }}
+          #   - cci-demo-haskell-v1-{{ checksum "stack.yaml" }}
+      - run:
+          name: Resolve/Update Dependencies
+          command: stack --no-terminal setup
+      - run:
+          name: Run tests
+          command: stack --no-terminal test
+      - run:
+          name: Install executable
+          command: stack --no-terminal install
+      # - save_cache:
+      #     name: Cache Dependencies
+      #     key: cci-demo-haskell-v1-{{ checksum "stack.yaml" }}-{{ checksum "package.yaml" }}
+      #     paths:
+      #       - "/root/.stack"
+      #       - ".stack-work"
+      - store_artifacts:
+          # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
+          path: ~/.local/bin/circleci-demo-haskell-exe
+          destination: circleci-demo-haskell-exe
 
-jobs:
-   build:
-     docker:
-       - image: nixos/nix
-     steps:
-       - *local_setup
-       - checkout
-       - run: echo "A first hello"
-       - run: chmod +x .ci/build_withStack.sh
-       - run: sh ./.ci/build_withStack.sh
-       - run: pwd
-       - run: ls -la
-       - run: ls -la ./.ci
-#       - run: wget -qO- https://get.haskellstack.org/ | sh
-       - run: sh ./.ci/setup.sh
-#       - run: stack build
-       - run: cabal new-build

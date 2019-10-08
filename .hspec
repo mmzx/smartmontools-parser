@@ -1,0 +1,4 @@
+--format=progress
+--color
+--diff
+--print-cpu-time

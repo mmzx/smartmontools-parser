@@ -10,14 +10,14 @@ import qualified Data.ByteString.Lazy.Char8 as BSL
 import           System.Exit                (exitFailure)
 import           System.IO                  (hPutStrLn, stderr)
 
-parseFile ∷ FilePath → IO TopLevel
+parseFile ∷ FilePath → IO Smart
 parseFile filename = do
   input <- BSL.readFile filename
   case decode input of
     Nothing -> fatal $ case (decode input :: Maybe Value) of
-                         Nothing -> "Invalid JSON file: "     ++ filename
+                         Nothing -> "Invalid JSON file: " ++ filename
                          Just _  -> "Mismatched JSON value from file: " ++ filename
-    Just r  -> return (r :: TopLevel)
+    Just r  -> return (r :: Smart)
   where
     fatal ∷ String → IO a
     fatal msg = do hPutStrLn stderr msg

@@ -1,0 +1,58 @@
+{
+  "json_format_version": [
+    1,
+    0
+  ],
+  "smartctl": {
+    "version": [
+      7,
+      0
+    ],
+    "svn_revision": "4883",
+    "platform_info": "x86_64-w64-mingw32-w10-1809",
+    "build_info": "(sf-7.0-1)",
+    "argv": [
+      "smartctl",
+      "--all",
+      "-j",
+      "/dev/csmi0,1"
+    ],
+    "exit_status": 4
+  },
+  "device": {
+    "name": "/dev/csmi0,1",
+    "info_name": "/dev/csmi0,1",
+    "type": "ata",
+    "protocol": "ATA"
+  },
+  "model_name": "HL-DT-ST DVDRAM GH24NSC0",
+  "serial_number": "K1IHAOE1107",
+  "wwn": {
+    "naa": 5,
+    "oui": 5248,
+    "id": 0
+  },
+  "firmware_version": "LI00",
+  "in_smartctl_database": false,
+  "ata_version": {
+    "string": "ATA8-ACS (unknown minor revision code: 0x0210)",
+    "major_value": 496,
+    "minor_value": 528
+  },
+  "sata_version": {
+    "string": "SATA 3.0",
+    "value": 63
+  },
+  "interface_speed": {
+    "max": {
+      "sata_value": 2,
+      "string": "1.5 Gb/s",
+      "units_per_second": 15,
+      "bits_per_unit": 100000000
+    }
+  },
+  "local_time": {
+    "time_t": 1570609867,
+    "asctime": "Wed Oct 09 10:31:07 2019 RDT"
+  }
+}

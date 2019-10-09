@@ -8,7 +8,7 @@
 
 {- | Generating this file was aided by the package `json-autotype`. -}
 
-module  System.Smartmon.Datatypes
+module System.Smartmon.Datatypes
   ( Smart(..) )
 where
 
@@ -25,8 +25,9 @@ import qualified GHC.Generics
 (.:??) :: FromJSON a => Object -> Text -> Parser (Maybe a)
 o .:?? val = fmap join (o .:? val)
 
+
 data LocalTime = LocalTime {
-    localTimeTimeT   :: Double,
+    localTimeTimeT :: Double,
     localTimeAsctime :: Text
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -41,9 +42,25 @@ instance ToJSON LocalTime where
   toEncoding (LocalTime {..}) = pairs  ("time_t" .= localTimeTimeT<>"asctime" .= localTimeAsctime)
 
 
+data DeviceType = DeviceType {
+    deviceTypeName :: Text,
+    deviceTypeScsiValue :: Double
+  } deriving (Show,Eq,GHC.Generics.Generic)
+
+
+instance FromJSON DeviceType where
+  parseJSON (Object v) = DeviceType <$> v .:   "name" <*> v .:   "scsi_value"
+  parseJSON _          = mzero
+
+
+instance ToJSON DeviceType where
+  toJSON     (DeviceType {..}) = object ["name" .= deviceTypeName, "scsi_value" .= deviceTypeScsiValue]
+  toEncoding (DeviceType {..}) = pairs  ("name" .= deviceTypeName<>"scsi_value" .= deviceTypeScsiValue)
+
+
 data SataVersion = SataVersion {
     sataVersionString :: Text,
-    sataVersionValue  :: Double
+    sataVersionValue :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -74,9 +91,9 @@ instance ToJSON SmartStatus where
 
 data Current = Current {
     currentUnitsPerSecond :: Double,
-    currentBitsPerUnit    :: Double,
-    currentString         :: Text,
-    currentSataValue      :: Double
+    currentBitsPerUnit :: Double,
+    currentString :: Text,
+    currentSataValue :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -91,13 +108,13 @@ instance ToJSON Current where
 
 
 data InterfaceSpeed = InterfaceSpeed {
-    interfaceSpeedMax     :: Current,
-    interfaceSpeedCurrent :: Current
+    interfaceSpeedMax :: Current,
+    interfaceSpeedCurrent :: (Maybe (Current:|:[(Maybe Value)]))
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
 instance FromJSON InterfaceSpeed where
-  parseJSON (Object v) = InterfaceSpeed <$> v .:   "max" <*> v .:   "current"
+  parseJSON (Object v) = InterfaceSpeed <$> v .:   "max" <*> v .:?? "current"
   parseJSON _          = mzero
 
 
@@ -109,7 +126,7 @@ instance ToJSON InterfaceSpeed where
 data Status = Status {
     statusString :: Text,
     statusPassed :: (Maybe (Bool:|:[(Maybe Value)])),
-    statusValue  :: Double
+    statusValue :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -124,7 +141,7 @@ instance ToJSON Status where
 
 
 data OfflineDataCollection = OfflineDataCollection {
-    offlineDataCollectionStatus            :: Status,
+    offlineDataCollectionStatus :: Status,
     offlineDataCollectionCompletionSeconds :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -140,24 +157,23 @@ instance ToJSON OfflineDataCollection where
 
 
 data PollingMinutes = PollingMinutes {
-    pollingMinutesExtended   :: Double,
-    pollingMinutesConveyance :: (Maybe (Double:|:[(Maybe Value)])),
-    pollingMinutesShort      :: Double
+    pollingMinutesExtended :: Double,
+    pollingMinutesShort :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
 instance FromJSON PollingMinutes where
-  parseJSON (Object v) = PollingMinutes <$> v .:   "extended" <*> v .:?? "conveyance" <*> v .:   "short"
+  parseJSON (Object v) = PollingMinutes <$> v .:   "extended" <*> v .:   "short"
   parseJSON _          = mzero
 
 
 instance ToJSON PollingMinutes where
-  toJSON     (PollingMinutes {..}) = object ["extended" .= pollingMinutesExtended, "conveyance" .= pollingMinutesConveyance, "short" .= pollingMinutesShort]
-  toEncoding (PollingMinutes {..}) = pairs  ("extended" .= pollingMinutesExtended<>"conveyance" .= pollingMinutesConveyance<>"short" .= pollingMinutesShort)
+  toJSON     (PollingMinutes {..}) = object ["extended" .= pollingMinutesExtended, "short" .= pollingMinutesShort]
+  toEncoding (PollingMinutes {..}) = pairs  ("extended" .= pollingMinutesExtended<>"short" .= pollingMinutesShort)
 
 
 data SelfTest = SelfTest {
-    selfTestStatus         :: Status,
+    selfTestStatus :: Status,
     selfTestPollingMinutes :: PollingMinutes
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -173,16 +189,16 @@ instance ToJSON SelfTest where
 
 
 data Capabilities = Capabilities {
-    capabilitiesAttributeAutosaveEnabled      :: Bool,
-    capabilitiesSelfTestsSupported            :: Bool,
+    capabilitiesAttributeAutosaveEnabled :: Bool,
+    capabilitiesSelfTestsSupported :: Bool,
     capabilitiesExecOfflineImmediateSupported :: Bool,
-    capabilitiesConveyanceSelfTestSupported   :: Bool,
-    capabilitiesOfflineIsAbortedUponNewCmd    :: Bool,
-    capabilitiesErrorLoggingSupported         :: Bool,
-    capabilitiesValues                        :: [Double],
-    capabilitiesGpLoggingSupported            :: Bool,
-    capabilitiesOfflineSurfaceScanSupported   :: Bool,
-    capabilitiesSelectiveSelfTestSupported    :: Bool
+    capabilitiesConveyanceSelfTestSupported :: Bool,
+    capabilitiesOfflineIsAbortedUponNewCmd :: Bool,
+    capabilitiesErrorLoggingSupported :: Bool,
+    capabilitiesValues :: [Double],
+    capabilitiesGpLoggingSupported :: Bool,
+    capabilitiesOfflineSurfaceScanSupported :: Bool,
+    capabilitiesSelectiveSelfTestSupported :: Bool
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -198,8 +214,8 @@ instance ToJSON Capabilities where
 
 data AtaSmartData = AtaSmartData {
     ataSmartDataOfflineDataCollection :: OfflineDataCollection,
-    ataSmartDataSelfTest              :: SelfTest,
-    ataSmartDataCapabilities          :: Capabilities
+    ataSmartDataSelfTest :: SelfTest,
+    ataSmartDataCapabilities :: Capabilities
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -215,8 +231,8 @@ instance ToJSON AtaSmartData where
 
 data Device = Device {
     deviceProtocol :: Text,
-    deviceName     :: Text,
-    deviceType     :: Text,
+    deviceName :: Text,
+    deviceType :: Text,
     deviceInfoName :: Text
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -247,7 +263,7 @@ instance ToJSON PowerOnTime where
 
 
 data Standard = Standard {
-    standardCount    :: Double,
+    standardCount :: Double,
     standardRevision :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -279,9 +295,9 @@ instance ToJSON AtaSmartSelfTestLog where
 
 data AtaSctCapabilities = AtaSctCapabilities {
     ataSctCapabilitiesErrorRecoveryControlSupported :: Bool,
-    ataSctCapabilitiesValue                         :: Double,
-    ataSctCapabilitiesFeatureControlSupported       :: Bool,
-    ataSctCapabilitiesDataTableSupported            :: Bool
+    ataSctCapabilitiesValue :: Double,
+    ataSctCapabilitiesFeatureControlSupported :: Bool,
+    ataSctCapabilitiesDataTableSupported :: Bool
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -296,14 +312,14 @@ instance ToJSON AtaSctCapabilities where
 
 
 data Flags = Flags {
-    flagsPrefailure           :: (Maybe (Bool:|:[(Maybe Value)])),
-    flagsString               :: (Maybe (Text:|:[(Maybe Value)])),
-    flagsErrorRate            :: (Maybe (Bool:|:[(Maybe Value)])),
-    flagsPerformance          :: (Maybe (Bool:|:[(Maybe Value)])),
-    flagsEventCount           :: (Maybe (Bool:|:[(Maybe Value)])),
-    flagsValue                :: Double,
-    flagsAutoKeep             :: (Maybe (Bool:|:[(Maybe Value)])),
-    flagsUpdatedOnline        :: (Maybe (Bool:|:[(Maybe Value)])),
+    flagsPrefailure :: (Maybe (Bool:|:[(Maybe Value)])),
+    flagsString :: (Maybe (Text:|:[(Maybe Value)])),
+    flagsErrorRate :: (Maybe (Bool:|:[(Maybe Value)])),
+    flagsPerformance :: (Maybe (Bool:|:[(Maybe Value)])),
+    flagsEventCount :: (Maybe (Bool:|:[(Maybe Value)])),
+    flagsValue :: Double,
+    flagsAutoKeep :: (Maybe (Bool:|:[(Maybe Value)])),
+    flagsUpdatedOnline :: (Maybe (Bool:|:[(Maybe Value)])),
     flagsRemainderScanEnabled :: (Maybe (Bool:|:[(Maybe Value)]))
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -319,17 +335,17 @@ instance ToJSON Flags where
 
 
 data TableElt = TableElt {
-    tableEltRaw        :: (Maybe (SataVersion:|:[(Maybe Value)])),
-    tableEltStatus     :: (Maybe (Status:|:[(Maybe Value)])),
-    tableEltFlags      :: (Maybe (Flags:|:[(Maybe Value)])),
-    tableEltLbaMin     :: (Maybe (Double:|:[(Maybe Value)])),
-    tableEltWorst      :: (Maybe (Double:|:[(Maybe Value)])),
-    tableEltValue      :: (Maybe (Double:|:[(Maybe Value)])),
-    tableEltLbaMax     :: (Maybe (Double:|:[(Maybe Value)])),
-    tableEltName       :: (Maybe (Text:|:[(Maybe Value)])),
-    tableEltId         :: (Maybe (Double:|:[(Maybe Value)])),
+    tableEltRaw :: (Maybe (SataVersion:|:[(Maybe Value)])),
+    tableEltStatus :: (Maybe (Status:|:[(Maybe Value)])),
+    tableEltFlags :: (Maybe (Flags:|:[(Maybe Value)])),
+    tableEltLbaMin :: (Maybe (Double:|:[(Maybe Value)])),
+    tableEltWorst :: (Maybe (Double:|:[(Maybe Value)])),
+    tableEltValue :: (Maybe (Double:|:[(Maybe Value)])),
+    tableEltLbaMax :: (Maybe (Double:|:[(Maybe Value)])),
+    tableEltName :: (Maybe (Text:|:[(Maybe Value)])),
+    tableEltId :: (Maybe (Double:|:[(Maybe Value)])),
     tableEltWhenFailed :: (Maybe (Text:|:[(Maybe Value)])),
-    tableEltThresh     :: (Maybe (Double:|:[(Maybe Value)]))
+    tableEltThresh :: (Maybe (Double:|:[(Maybe Value)]))
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -344,10 +360,10 @@ instance ToJSON TableElt where
 
 
 data AtaSmartSelectiveSelfTestLog = AtaSmartSelectiveSelfTestLog {
-    ataSmartSelectiveSelfTestLogFlags                    :: Flags,
+    ataSmartSelectiveSelfTestLogFlags :: Flags,
     ataSmartSelectiveSelfTestLogPowerUpScanResumeMinutes :: Double,
-    ataSmartSelectiveSelfTestLogRevision                 :: Double,
-    ataSmartSelectiveSelfTestLogTable                    :: [TableElt]
+    ataSmartSelectiveSelfTestLogRevision :: Double,
+    ataSmartSelectiveSelfTestLogTable :: [TableElt]
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -378,7 +394,7 @@ instance ToJSON AtaSmartErrorLog where
 
 data AtaVersion = AtaVersion {
     ataVersionMajorValue :: Double,
-    ataVersionString     :: Text,
+    ataVersionString :: Text,
     ataVersionMinorValue :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -393,40 +409,25 @@ instance ToJSON AtaVersion where
   toEncoding (AtaVersion {..}) = pairs  ("major_value" .= ataVersionMajorValue<>"string" .= ataVersionString<>"minor_value" .= ataVersionMinorValue)
 
 
-data FormFactor = FormFactor {
-    formFactorName     :: Text,
-    formFactorAtaValue :: Double
-  } deriving (Show,Eq,GHC.Generics.Generic)
-
-
-instance FromJSON FormFactor where
-  parseJSON (Object v) = FormFactor <$> v .:   "name" <*> v .:   "ata_value"
-  parseJSON _          = mzero
-
-
-instance ToJSON FormFactor where
-  toJSON     (FormFactor {..}) = object ["name" .= formFactorName, "ata_value" .= formFactorAtaValue]
-  toEncoding (FormFactor {..}) = pairs  ("name" .= formFactorName<>"ata_value" .= formFactorAtaValue)
-
-
 data Temperature = Temperature {
-    temperatureCurrent :: Double
+    temperatureCurrent :: Double,
+    temperatureDriveTrip :: (Maybe (Double:|:[(Maybe Value)]))
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
 instance FromJSON Temperature where
-  parseJSON (Object v) = Temperature <$> v .:   "current"
+  parseJSON (Object v) = Temperature <$> v .:   "current" <*> v .:?? "drive_trip"
   parseJSON _          = mzero
 
 
 instance ToJSON Temperature where
-  toJSON     (Temperature {..}) = object ["current" .= temperatureCurrent]
-  toEncoding (Temperature {..}) = pairs  ("current" .= temperatureCurrent)
+  toJSON     (Temperature {..}) = object ["current" .= temperatureCurrent, "drive_trip" .= temperatureDriveTrip]
+  toEncoding (Temperature {..}) = pairs  ("current" .= temperatureCurrent<>"drive_trip" .= temperatureDriveTrip)
 
 
 data UserCapacity = UserCapacity {
     userCapacityBlocks :: Double,
-    userCapacityBytes  :: Double
+    userCapacityBytes :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -442,7 +443,7 @@ instance ToJSON UserCapacity where
 
 data AtaSmartAttributes = AtaSmartAttributes {
     ataSmartAttributesRevision :: Double,
-    ataSmartAttributesTable    :: [TableElt]
+    ataSmartAttributesTable :: [TableElt]
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -456,29 +457,46 @@ instance ToJSON AtaSmartAttributes where
   toEncoding (AtaSmartAttributes {..}) = pairs  ("revision" .= ataSmartAttributesRevision<>"table" .= ataSmartAttributesTable)
 
 
+data MessagesElt = MessagesElt {
+    messagesEltString :: Text,
+    messagesEltSeverity :: Text
+  } deriving (Show,Eq,GHC.Generics.Generic)
+
+
+instance FromJSON MessagesElt where
+  parseJSON (Object v) = MessagesElt <$> v .:   "string" <*> v .:   "severity"
+  parseJSON _          = mzero
+
+
+instance ToJSON MessagesElt where
+  toJSON     (MessagesElt {..}) = object ["string" .= messagesEltString, "severity" .= messagesEltSeverity]
+  toEncoding (MessagesElt {..}) = pairs  ("string" .= messagesEltString<>"severity" .= messagesEltSeverity)
+
+
 data Smartctl = Smartctl {
-    smartctlBuildInfo    :: Text,
-    smartctlSvnRevision  :: Text,
-    smartctlVersion      :: [Double],
-    smartctlArgv         :: [Text],
-    smartctlExitStatus   :: Double,
+    smartctlBuildInfo :: Text,
+    smartctlSvnRevision :: Text,
+    smartctlVersion :: [Double],
+    smartctlArgv :: [Text],
+    smartctlMessages :: (Maybe ([MessagesElt])),
+    smartctlExitStatus :: Double,
     smartctlPlatformInfo :: Text
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
 instance FromJSON Smartctl where
-  parseJSON (Object v) = Smartctl <$> v .:   "build_info" <*> v .:   "svn_revision" <*> v .:   "version" <*> v .:   "argv" <*> v .:   "exit_status" <*> v .:   "platform_info"
+  parseJSON (Object v) = Smartctl <$> v .:   "build_info" <*> v .:   "svn_revision" <*> v .:   "version" <*> v .:   "argv" <*> v .:?? "messages" <*> v .:   "exit_status" <*> v .:   "platform_info"
   parseJSON _          = mzero
 
 
 instance ToJSON Smartctl where
-  toJSON     (Smartctl {..}) = object ["build_info" .= smartctlBuildInfo, "svn_revision" .= smartctlSvnRevision, "version" .= smartctlVersion, "argv" .= smartctlArgv, "exit_status" .= smartctlExitStatus, "platform_info" .= smartctlPlatformInfo]
-  toEncoding (Smartctl {..}) = pairs  ("build_info" .= smartctlBuildInfo<>"svn_revision" .= smartctlSvnRevision<>"version" .= smartctlVersion<>"argv" .= smartctlArgv<>"exit_status" .= smartctlExitStatus<>"platform_info" .= smartctlPlatformInfo)
+  toJSON     (Smartctl {..}) = object ["build_info" .= smartctlBuildInfo, "svn_revision" .= smartctlSvnRevision, "version" .= smartctlVersion, "argv" .= smartctlArgv, "messages" .= smartctlMessages, "exit_status" .= smartctlExitStatus, "platform_info" .= smartctlPlatformInfo]
+  toEncoding (Smartctl {..}) = pairs  ("build_info" .= smartctlBuildInfo<>"svn_revision" .= smartctlSvnRevision<>"version" .= smartctlVersion<>"argv" .= smartctlArgv<>"messages" .= smartctlMessages<>"exit_status" .= smartctlExitStatus<>"platform_info" .= smartctlPlatformInfo)
 
 
 data Wwn = Wwn {
     wwnOui :: Double,
-    wwnId  :: Double,
+    wwnId :: Double,
     wwnNaa :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -494,42 +512,46 @@ instance ToJSON Wwn where
 
 
 data Smart = Smart {
-    topLevelSerialNumber :: Text,
-    topLevelPowerCycleCount :: Double,
-    topLevelFirmwareVersion :: Text,
-    topLevelLocalTime :: LocalTime,
-    topLevelModelName :: Text,
-    topLevelLogicalBlockSize :: Double,
-    topLevelSataVersion :: SataVersion,
-    topLevelSmartStatus :: SmartStatus,
-    topLevelInterfaceSpeed :: InterfaceSpeed,
-    topLevelAtaSmartData :: AtaSmartData,
-    topLevelDevice :: Device,
-    topLevelPowerOnTime :: PowerOnTime,
-    topLevelAtaSmartSelfTestLog :: AtaSmartSelfTestLog,
-    topLevelAtaSctCapabilities :: AtaSctCapabilities,
-    topLevelAtaSmartSelectiveSelfTestLog :: AtaSmartSelectiveSelfTestLog,
-    topLevelAtaSmartErrorLog :: AtaSmartErrorLog,
-    topLevelAtaVersion :: AtaVersion,
-    topLevelRotationRate :: Double,
-    topLevelPhysicalBlockSize :: Double,
+    topLevelSerialNumber :: (Maybe (Text:|:[(Maybe Value)])),
+    topLevelPowerCycleCount :: (Maybe (Double:|:[(Maybe Value)])),
+    topLevelVendor :: (Maybe (Text:|:[(Maybe Value)])),
+    topLevelFirmwareVersion :: (Maybe (Text:|:[(Maybe Value)])),
+    topLevelLocalTime :: (Maybe (LocalTime:|:[(Maybe Value)])),
+    topLevelModelName :: (Maybe (Text:|:[(Maybe Value)])),
+    topLevelLogicalBlockSize :: (Maybe (Double:|:[(Maybe Value)])),
+    topLevelDeviceType :: (Maybe (DeviceType:|:[(Maybe Value)])),
+    topLevelSataVersion :: (Maybe (SataVersion:|:[(Maybe Value)])),
+    topLevelSmartStatus :: (Maybe (SmartStatus:|:[(Maybe Value)])),
+    topLevelInterfaceSpeed :: (Maybe (InterfaceSpeed:|:[(Maybe Value)])),
+    topLevelAtaSmartData :: (Maybe (AtaSmartData:|:[(Maybe Value)])),
+    topLevelDevice :: (Maybe (Device:|:[(Maybe Value)])),
+    topLevelPowerOnTime :: (Maybe (PowerOnTime:|:[(Maybe Value)])),
+    topLevelAtaSmartSelfTestLog :: (Maybe (AtaSmartSelfTestLog:|:[(Maybe Value)])),
+    topLevelAtaSctCapabilities :: (Maybe (AtaSctCapabilities:|:[(Maybe Value)])),
+    topLevelAtaSmartSelectiveSelfTestLog :: (Maybe (AtaSmartSelectiveSelfTestLog:|:[(Maybe Value)])),
+    topLevelAtaSmartErrorLog :: (Maybe (AtaSmartErrorLog:|:[(Maybe Value)])),
+    topLevelAtaVersion :: (Maybe (AtaVersion:|:[(Maybe Value)])),
+    topLevelRotationRate :: (Maybe (Double:|:[(Maybe Value)])),
+    topLevelPhysicalBlockSize :: (Maybe (Double:|:[(Maybe Value)])),
     topLevelJsonFormatVersion :: [Double],
-    topLevelFormFactor :: (Maybe (FormFactor:|:[(Maybe Value)])),
-    topLevelTemperature :: Temperature,
-    topLevelUserCapacity :: UserCapacity,
-    topLevelAtaSmartAttributes :: AtaSmartAttributes,
+    topLevelTemperature :: (Maybe (Temperature:|:[(Maybe Value)])),
+    topLevelScsiVersion :: (Maybe (Text:|:[(Maybe Value)])),
+    topLevelUserCapacity :: (Maybe (UserCapacity:|:[(Maybe Value)])),
+    topLevelAtaSmartAttributes :: (Maybe (AtaSmartAttributes:|:[(Maybe Value)])),
     topLevelSmartctl :: Smartctl,
-    topLevelInSmartctlDatabase :: Bool,
-    topLevelModelFamily :: Text,
-    topLevelWwn :: Wwn
+    topLevelInSmartctlDatabase :: (Maybe (Bool:|:[(Maybe Value)])),
+    topLevelProduct :: (Maybe (Text:|:[(Maybe Value)])),
+    topLevelRevision :: (Maybe (Text:|:[(Maybe Value)])),
+    topLevelModelFamily :: (Maybe (Text:|:[(Maybe Value)])),
+    topLevelWwn :: (Maybe (Wwn:|:[(Maybe Value)]))
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
 instance FromJSON Smart where
-  parseJSON (Object v) = Smart <$> v .:   "serial_number" <*> v .:   "power_cycle_count" <*> v .:   "firmware_version" <*> v .:   "local_time" <*> v .:   "model_name" <*> v .:   "logical_block_size" <*> v .:   "sata_version" <*> v .:   "smart_status" <*> v .:   "interface_speed" <*> v .:   "ata_smart_data" <*> v .:   "device" <*> v .:   "power_on_time" <*> v .:   "ata_smart_self_test_log" <*> v .:   "ata_sct_capabilities" <*> v .:   "ata_smart_selective_self_test_log" <*> v .:   "ata_smart_error_log" <*> v .:   "ata_version" <*> v .:   "rotation_rate" <*> v .:   "physical_block_size" <*> v .:   "json_format_version" <*> v .:?? "form_factor" <*> v .:   "temperature" <*> v .:   "user_capacity" <*> v .:   "ata_smart_attributes" <*> v .:   "smartctl" <*> v .:   "in_smartctl_database" <*> v .:   "model_family" <*> v .:   "wwn"
+  parseJSON (Object v) = Smart <$> v .:?? "serial_number" <*> v .:?? "power_cycle_count" <*> v .:?? "vendor" <*> v .:?? "firmware_version" <*> v .:?? "local_time" <*> v .:?? "model_name" <*> v .:?? "logical_block_size" <*> v .:?? "device_type" <*> v .:?? "sata_version" <*> v .:?? "smart_status" <*> v .:?? "interface_speed" <*> v .:?? "ata_smart_data" <*> v .:?? "device" <*> v .:?? "power_on_time" <*> v .:?? "ata_smart_self_test_log" <*> v .:?? "ata_sct_capabilities" <*> v .:?? "ata_smart_selective_self_test_log" <*> v .:?? "ata_smart_error_log" <*> v .:?? "ata_version" <*> v .:?? "rotation_rate" <*> v .:?? "physical_block_size" <*> v .:   "json_format_version" <*> v .:?? "temperature" <*> v .:?? "scsi_version" <*> v .:?? "user_capacity" <*> v .:?? "ata_smart_attributes" <*> v .:   "smartctl" <*> v .:?? "in_smartctl_database" <*> v .:?? "product" <*> v .:?? "revision" <*> v .:?? "model_family" <*> v .:?? "wwn"
   parseJSON _          = mzero
 
 
 instance ToJSON Smart where
-  toJSON     (Smart {..}) = object ["serial_number" .= topLevelSerialNumber, "power_cycle_count" .= topLevelPowerCycleCount, "firmware_version" .= topLevelFirmwareVersion, "local_time" .= topLevelLocalTime, "model_name" .= topLevelModelName, "logical_block_size" .= topLevelLogicalBlockSize, "sata_version" .= topLevelSataVersion, "smart_status" .= topLevelSmartStatus, "interface_speed" .= topLevelInterfaceSpeed, "ata_smart_data" .= topLevelAtaSmartData, "device" .= topLevelDevice, "power_on_time" .= topLevelPowerOnTime, "ata_smart_self_test_log" .= topLevelAtaSmartSelfTestLog, "ata_sct_capabilities" .= topLevelAtaSctCapabilities, "ata_smart_selective_self_test_log" .= topLevelAtaSmartSelectiveSelfTestLog, "ata_smart_error_log" .= topLevelAtaSmartErrorLog, "ata_version" .= topLevelAtaVersion, "rotation_rate" .= topLevelRotationRate, "physical_block_size" .= topLevelPhysicalBlockSize, "json_format_version" .= topLevelJsonFormatVersion, "form_factor" .= topLevelFormFactor, "temperature" .= topLevelTemperature, "user_capacity" .= topLevelUserCapacity, "ata_smart_attributes" .= topLevelAtaSmartAttributes, "smartctl" .= topLevelSmartctl, "in_smartctl_database" .= topLevelInSmartctlDatabase, "model_family" .= topLevelModelFamily, "wwn" .= topLevelWwn]
-  toEncoding (Smart {..}) = pairs  ("serial_number" .= topLevelSerialNumber<>"power_cycle_count" .= topLevelPowerCycleCount<>"firmware_version" .= topLevelFirmwareVersion<>"local_time" .= topLevelLocalTime<>"model_name" .= topLevelModelName<>"logical_block_size" .= topLevelLogicalBlockSize<>"sata_version" .= topLevelSataVersion<>"smart_status" .= topLevelSmartStatus<>"interface_speed" .= topLevelInterfaceSpeed<>"ata_smart_data" .= topLevelAtaSmartData<>"device" .= topLevelDevice<>"power_on_time" .= topLevelPowerOnTime<>"ata_smart_self_test_log" .= topLevelAtaSmartSelfTestLog<>"ata_sct_capabilities" .= topLevelAtaSctCapabilities<>"ata_smart_selective_self_test_log" .= topLevelAtaSmartSelectiveSelfTestLog<>"ata_smart_error_log" .= topLevelAtaSmartErrorLog<>"ata_version" .= topLevelAtaVersion<>"rotation_rate" .= topLevelRotationRate<>"physical_block_size" .= topLevelPhysicalBlockSize<>"json_format_version" .= topLevelJsonFormatVersion<>"form_factor" .= topLevelFormFactor<>"temperature" .= topLevelTemperature<>"user_capacity" .= topLevelUserCapacity<>"ata_smart_attributes" .= topLevelAtaSmartAttributes<>"smartctl" .= topLevelSmartctl<>"in_smartctl_database" .= topLevelInSmartctlDatabase<>"model_family" .= topLevelModelFamily<>"wwn" .= topLevelWwn)
+  toJSON     (Smart {..}) = object ["serial_number" .= topLevelSerialNumber, "power_cycle_count" .= topLevelPowerCycleCount, "vendor" .= topLevelVendor, "firmware_version" .= topLevelFirmwareVersion, "local_time" .= topLevelLocalTime, "model_name" .= topLevelModelName, "logical_block_size" .= topLevelLogicalBlockSize, "device_type" .= topLevelDeviceType, "sata_version" .= topLevelSataVersion, "smart_status" .= topLevelSmartStatus, "interface_speed" .= topLevelInterfaceSpeed, "ata_smart_data" .= topLevelAtaSmartData, "device" .= topLevelDevice, "power_on_time" .= topLevelPowerOnTime, "ata_smart_self_test_log" .= topLevelAtaSmartSelfTestLog, "ata_sct_capabilities" .= topLevelAtaSctCapabilities, "ata_smart_selective_self_test_log" .= topLevelAtaSmartSelectiveSelfTestLog, "ata_smart_error_log" .= topLevelAtaSmartErrorLog, "ata_version" .= topLevelAtaVersion, "rotation_rate" .= topLevelRotationRate, "physical_block_size" .= topLevelPhysicalBlockSize, "json_format_version" .= topLevelJsonFormatVersion, "temperature" .= topLevelTemperature, "scsi_version" .= topLevelScsiVersion, "user_capacity" .= topLevelUserCapacity, "ata_smart_attributes" .= topLevelAtaSmartAttributes, "smartctl" .= topLevelSmartctl, "in_smartctl_database" .= topLevelInSmartctlDatabase, "product" .= topLevelProduct, "revision" .= topLevelRevision, "model_family" .= topLevelModelFamily, "wwn" .= topLevelWwn]
+  toEncoding (Smart {..}) = pairs  ("serial_number" .= topLevelSerialNumber<>"power_cycle_count" .= topLevelPowerCycleCount<>"vendor" .= topLevelVendor<>"firmware_version" .= topLevelFirmwareVersion<>"local_time" .= topLevelLocalTime<>"model_name" .= topLevelModelName<>"logical_block_size" .= topLevelLogicalBlockSize<>"device_type" .= topLevelDeviceType<>"sata_version" .= topLevelSataVersion<>"smart_status" .= topLevelSmartStatus<>"interface_speed" .= topLevelInterfaceSpeed<>"ata_smart_data" .= topLevelAtaSmartData<>"device" .= topLevelDevice<>"power_on_time" .= topLevelPowerOnTime<>"ata_smart_self_test_log" .= topLevelAtaSmartSelfTestLog<>"ata_sct_capabilities" .= topLevelAtaSctCapabilities<>"ata_smart_selective_self_test_log" .= topLevelAtaSmartSelectiveSelfTestLog<>"ata_smart_error_log" .= topLevelAtaSmartErrorLog<>"ata_version" .= topLevelAtaVersion<>"rotation_rate" .= topLevelRotationRate<>"physical_block_size" .= topLevelPhysicalBlockSize<>"json_format_version" .= topLevelJsonFormatVersion<>"temperature" .= topLevelTemperature<>"scsi_version" .= topLevelScsiVersion<>"user_capacity" .= topLevelUserCapacity<>"ata_smart_attributes" .= topLevelAtaSmartAttributes<>"smartctl" .= topLevelSmartctl<>"in_smartctl_database" .= topLevelInSmartctlDatabase<>"product" .= topLevelProduct<>"revision" .= topLevelRevision<>"model_family" .= topLevelModelFamily<>"wwn" .= topLevelWwn)

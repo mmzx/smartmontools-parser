@@ -9,7 +9,6 @@
 {- | Generating this file was aided by the package `json-autotype`. -}
 
 module System.Smartmon.Datatypes
-  ( Smart(..) )
 where
 
 import           Control.Monad                   (join, mzero)

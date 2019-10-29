@@ -5,6 +5,7 @@ module System.Smartmon.Parser
   ( getSmartInfo
   , parseFile
   , parseSmart
+  , mkSmartInfo
   , SmartInfo(..)
   , SmartValue(..)
   ) where
@@ -28,6 +29,9 @@ data SmartValue a = Unknown
                   | DecodeError
                   | SmartValue a
                   deriving (Eq, Show)
+
+mkSmartInfo :: SmartInfo
+mkSmartInfo = SmartInfo Unknown Unknown Unknown
 
 fetchBy :: (a -> b) -> Maybe (a :|: [Maybe Value]) -> SmartValue b
 fetchBy _ Nothing             = Unknown

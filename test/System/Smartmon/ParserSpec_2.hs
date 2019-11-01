@@ -56,7 +56,7 @@ spec = do
       result `shouldBe` expected
 
     it "Operate on undecidable values 2." $ do
-      let input = ((SmartValue 4) * Unknown - (SmartValue 19)) :: SmartValue Int
+      let input = ((SmartValue 4) * Unknown - (SmartValue 19) + (abs Unknown)) :: SmartValue Int
           expected = Unknown
           result = signum input
       result `shouldBe` expected
@@ -72,6 +72,9 @@ spec = do
 
     it "Abs" $ Q.property $
       \x -> (abs $ SmartValue x) == (SmartValue $ abs (x::Int))
+
+    it "Abs" $
+      (abs $ Unknown) `shouldBe` (Unknown :: SmartValue Int)
 
     it "fromInteger" $ Q.property $
       \x -> fromInteger x == SmartValue x

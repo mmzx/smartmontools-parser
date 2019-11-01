@@ -4,38 +4,47 @@ module System.Smartmon.ParserSpec_2
   ( spec
   ) where
 
-import           Control.Lens
 import           System.Smartmon.Parser
+
+import           Control.Lens
+import qualified Data.ByteString.Lazy.Char8      as BSL (readFile)
 import           Test.Hspec
 import qualified Test.QuickCheck as Q
 
 spec :: Spec
 spec = do
   describe "Fetching relevant data of " $ do
-    it "failed smart reading." $ do
-      let expected = mkSmartInfo
+
+    it "When the tool cannot read smart data." $ do
       f <- parseFile "samples/smartInfo_fail-1.json"
-      let result = getSmartInfo f
+      let result = getSmartInfo <$> f
+          expected = Just mkSmartInfo
+      result `shouldBe` expected
+
+    it "Parsing fails." $ do
+      f <- parseFile "samples/incorrect-1.json"
+      let result = getSmartInfo <$> f
+          expected = Nothing
       result `shouldBe` expected
 
     it "Intel rapid storage RAID array." $ do
-      let expected =   set smRotRate 7200
+      let expected = Just $  set smRotRate 7200
                      . set smDriveModel (SmartValue "Intel Raid 1 Volume")
                      . set smPowOnTime Unknown $ mkSmartInfo
-      f <- parseFile "samples/smartInfo_raid.json"
-      let result = getSmartInfo f
+      f <- BSL.readFile "samples/smartInfo_raid.json"
+      let result = getSmartInfo <$> parseSmart f
       result `shouldBe` expected
 
     it "Optical drive." $ do
-      let expected = SmartInfo Unknown (SmartValue "HL-DT-ST DVDRAM GH24NSC0") Unknown
+      let expected = Just $ SmartInfo Unknown (SmartValue "HL-DT-ST DVDRAM GH24NSC0") Unknown
       f <- parseFile "samples/smartInfo_optical.json"
-      let result = getSmartInfo f
+      let result = getSmartInfo <$> f
       result `shouldBe` expected
 
     it "Spinning disk (HDD)." $ do
-      let expected = SmartInfo (SmartValue 846) (SmartValue "X SSD 850 PRO 128GB") (SmartValue 0)
+      let expected = Just $ SmartInfo (SmartValue 846) (SmartValue "X SSD 850 PRO 128GB") (SmartValue 0)
       f <- parseFile "samples/smartInfo_sda.json"
-      let result = getSmartInfo f
+      let result = getSmartInfo <$> f
       result `shouldBe` expected
 
   describe "Num instance of SmartValue." $ do

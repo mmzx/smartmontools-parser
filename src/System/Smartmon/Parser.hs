@@ -1,5 +1,4 @@
 {-# LANGUAGE TypeOperators   #-}
-{-# LANGUAGE UnicodeSyntax   #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module System.Smartmon.Parser
@@ -21,8 +20,6 @@ import           Data.Aeson                      (Value (..), decode)
 import           Data.Aeson.AutoType.Alternative
 import qualified Data.ByteString.Lazy.Char8      as BSL
 import qualified Data.Text                       as T (Text)
-import           System.Exit                     (exitFailure)
-import           System.IO                       (hPutStrLn, stderr)
 
 data SmartInfo = SmartInfo
   { _smPowOnTime  :: SmartValue Int,
@@ -77,18 +74,8 @@ getSmartInfo sd = SmartInfo {
 parseSmart :: BSL.ByteString -> Maybe Smart
 parseSmart = decode
 
-parseFile ∷ FilePath → IO Smart
-parseFile filename = do
-  input <- BSL.readFile filename
-  case decode input of
-    Nothing -> fatal $ case (decode input :: Maybe Value) of
-                         Nothing -> "Invalid JSON file: " <> filename
-                         Just _  -> "Mismatched JSON value from file: " <> filename
-    Just r  -> return (r :: Smart)
-  where
-    fatal ∷ String → IO a
-    fatal msg = do hPutStrLn stderr msg
-                   exitFailure
+parseFile :: FilePath -> IO (Maybe Smart)
+parseFile filename = BSL.readFile filename >>= return . parseSmart
 
 {-
 main ∷ IO ()

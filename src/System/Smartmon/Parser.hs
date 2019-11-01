@@ -1,17 +1,22 @@
-{-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE UnicodeSyntax #-}
+{-# LANGUAGE TypeOperators   #-}
+{-# LANGUAGE UnicodeSyntax   #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 module System.Smartmon.Parser
   ( getSmartInfo
   , parseFile
   , parseSmart
   , mkSmartInfo
+  , smPowOnTime
+  , smDriveModel
+  , smRotRate
   , SmartInfo(..)
   , SmartValue(..)
   ) where
 
 import           System.Smartmon.Datatypes
 
+import           Control.Lens
 import           Data.Aeson                      (Value (..), decode)
 import           Data.Aeson.AutoType.Alternative
 import qualified Data.ByteString.Lazy.Char8      as BSL
@@ -29,6 +34,30 @@ data SmartValue a = Unknown
                   | DecodeError
                   | SmartValue a
                   deriving (Eq, Show)
+
+instance (Ord a,Num a) => Num (SmartValue a) where
+
+  (+) (SmartValue x) (SmartValue y) = SmartValue $ x + y
+  (+) _ _ = Unknown
+
+  (*) (SmartValue x) (SmartValue y) = SmartValue $ x * y
+  (*) _ _ = Unknown
+
+  (-) (SmartValue x) (SmartValue y) = SmartValue $ x - y
+  (-) _ _ = Unknown
+
+  abs (SmartValue x) = SmartValue $ abs x
+  abs _ = Unknown
+
+  fromInteger = SmartValue . fromInteger
+
+  signum (SmartValue x)
+    | x < 0     = SmartValue (-1)
+    | x == 0    = SmartValue 0
+    | otherwise = SmartValue 1
+  signum _ = Unknown
+
+makeLenses ''SmartInfo
 
 mkSmartInfo :: SmartInfo
 mkSmartInfo = SmartInfo Unknown Unknown Unknown

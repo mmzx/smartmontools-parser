@@ -28,21 +28,34 @@ spec = do
       result `shouldBe` expected
 
     it "Intel rapid storage RAID array." $ do
-      let expected = Just $  set smRotRate 7200
+      let expected = Just
+                     . set smRotRate 7200
                      . set smDriveModel (SmartValue "Intel Raid 1 Volume")
-                     . set smPowOnTime Unknown $ mkSmartInfo
+                     . set smPowOnTime Unknown
+                     . set smDrvSerial (SmartValue "Volume1")
+                     $ mkSmartInfo
       f <- BSL.readFile "samples/smartInfo_raid.json"
       let result = getSmartInfo <$> parseSmart f
       result `shouldBe` expected
 
     it "Optical drive." $ do
-      let expected = Just $ SmartInfo Unknown (SmartValue "HL-DT-ST DVDRAM GH24NSC0") Unknown
+      let expected = Just
+                     . set smRotRate Unknown
+                     . set smDriveModel (SmartValue "HL-DT-ST DVDRAM GH24NSC0")
+                     . set smPowOnTime Unknown
+                     . set smDrvSerial (SmartValue "K1IHAOE1107")
+                     $ mkSmartInfo
       f <- parseFile "samples/smartInfo_optical.json"
       let result = getSmartInfo <$> f
       result `shouldBe` expected
 
-    it "Spinning disk (HDD)." $ do
-      let expected = Just $ SmartInfo (SmartValue 846) (SmartValue "X SSD 850 PRO 128GB") (SmartValue 0)
+    it "Hard disk (HDD or SSD)." $ do
+      let expected = Just
+                     . set smPowOnTime (SmartValue 846)
+                     . set smDriveModel (SmartValue "X SSD 850 PRO 128GB")
+                     . set smRotRate (SmartValue 0)
+                     . set smDrvSerial (SmartValue "S24ZN902000L")
+                     $ mkSmartInfo
       f <- parseFile "samples/smartInfo_sda.json"
       let result = getSmartInfo <$> f
       result `shouldBe` expected

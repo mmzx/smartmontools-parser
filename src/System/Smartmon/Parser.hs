@@ -9,6 +9,7 @@ module System.Smartmon.Parser
   , smPowOnTime
   , smDriveModel
   , smRotRate
+  , smDrvSerial
   , SmartInfo(..)
   , SmartValue(..)
   ) where
@@ -24,7 +25,8 @@ import qualified Data.Text                       as T (Text)
 data SmartInfo = SmartInfo
   { _smPowOnTime  :: SmartValue Int,
     _smDriveModel :: SmartValue T.Text,
-    _smRotRate    :: SmartValue Int
+    _smRotRate    :: SmartValue Int,
+    _smDrvSerial  :: SmartValue T.Text
   } deriving (Eq, Show)
 
 data SmartValue a = Unknown
@@ -57,7 +59,7 @@ instance (Ord a,Num a) => Num (SmartValue a) where
 makeLenses ''SmartInfo
 
 mkSmartInfo :: SmartInfo
-mkSmartInfo = SmartInfo Unknown Unknown Unknown
+mkSmartInfo = SmartInfo Unknown Unknown Unknown Unknown
 
 fetchBy :: (a -> b) -> Maybe (a :|: [Maybe Value]) -> SmartValue b
 fetchBy _ Nothing             = Unknown
@@ -68,7 +70,8 @@ getSmartInfo :: Smart -> SmartInfo
 getSmartInfo sd = SmartInfo {
   _smPowOnTime  = fetchBy (round . powerOnTimeHours) . topLevelPowerOnTime $ sd,
   _smDriveModel = fetchBy id . topLevelModelName $ sd,
-  _smRotRate    = fetchBy round . topLevelRotationRate $ sd
+  _smRotRate    = fetchBy round . topLevelRotationRate $ sd,
+  _smDrvSerial  = fetchBy id . topLevelSerialNumber $ sd
   }
 
 parseSmart :: BSL.ByteString -> Maybe Smart

@@ -1,14 +1,23 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE UnicodeSyntax     #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE UnicodeSyntax      #-}
 
 module System.Smartmon.ParserSpec
   ( spec
   ) where
 
-import Test.Hspec
-import System.Smartmon.Parser
-import System.Smartmon.Datatypes
 import           Data.Aeson.AutoType.Alternative
+import           System.Smartmon.Datatypes
+import           System.Smartmon.Parser
+import           Test.Hspec
+
+deriving instance Show SmartInfo
+
+instance Show a => Show (SmartValue a) where
+  show (SmartValue x) = show x
+  show Unknown        = "Unknown"
+  show DecodeError    = "DecodeError"
 
 spec :: Spec
 spec = do

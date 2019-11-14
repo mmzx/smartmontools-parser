@@ -1,4 +1,6 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE StandaloneDeriving #-}
 
 module System.Smartmon.ParserSpec_2
   ( spec
@@ -7,9 +9,16 @@ module System.Smartmon.ParserSpec_2
 import           System.Smartmon.Parser
 
 import           Control.Lens
-import qualified Data.ByteString.Lazy.Char8      as BSL (readFile)
+import qualified Data.ByteString.Lazy.Char8 as BSL (readFile)
 import           Test.Hspec
-import qualified Test.QuickCheck as Q
+import qualified Test.QuickCheck            as Q
+
+deriving instance Show SmartInfo
+
+instance Show a => Show (SmartValue a) where
+  show (SmartValue x) = show x
+  show Unknown        = "Unknown"
+  show DecodeError    = "DecodeError"
 
 spec :: Spec
 spec = do

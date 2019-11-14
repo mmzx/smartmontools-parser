@@ -26,7 +26,7 @@ o .:?? val = fmap join (o .:? val)
 
 
 data LocalTime = LocalTime {
-    localTimeTimeT :: Double,
+    localTimeTimeT   :: Double,
     localTimeAsctime :: Text
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -42,7 +42,7 @@ instance ToJSON LocalTime where
 
 
 data DeviceType = DeviceType {
-    deviceTypeName :: Text,
+    deviceTypeName      :: Text,
     deviceTypeScsiValue :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -59,7 +59,7 @@ instance ToJSON DeviceType where
 
 data SataVersion = SataVersion {
     sataVersionString :: Text,
-    sataVersionValue :: Double
+    sataVersionValue  :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -90,9 +90,9 @@ instance ToJSON SmartStatus where
 
 data Current = Current {
     currentUnitsPerSecond :: Double,
-    currentBitsPerUnit :: Double,
-    currentString :: Text,
-    currentSataValue :: Double
+    currentBitsPerUnit    :: Double,
+    currentString         :: Text,
+    currentSataValue      :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -107,7 +107,7 @@ instance ToJSON Current where
 
 
 data InterfaceSpeed = InterfaceSpeed {
-    interfaceSpeedMax :: Current,
+    interfaceSpeedMax     :: Current,
     interfaceSpeedCurrent :: (Maybe (Current:|:[(Maybe Value)]))
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -125,7 +125,7 @@ instance ToJSON InterfaceSpeed where
 data Status = Status {
     statusString :: Text,
     statusPassed :: (Maybe (Bool:|:[(Maybe Value)])),
-    statusValue :: Double
+    statusValue  :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -140,7 +140,7 @@ instance ToJSON Status where
 
 
 data OfflineDataCollection = OfflineDataCollection {
-    offlineDataCollectionStatus :: Status,
+    offlineDataCollectionStatus            :: Status,
     offlineDataCollectionCompletionSeconds :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -157,7 +157,7 @@ instance ToJSON OfflineDataCollection where
 
 data PollingMinutes = PollingMinutes {
     pollingMinutesExtended :: Double,
-    pollingMinutesShort :: Double
+    pollingMinutesShort    :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -172,7 +172,7 @@ instance ToJSON PollingMinutes where
 
 
 data SelfTest = SelfTest {
-    selfTestStatus :: Status,
+    selfTestStatus         :: Status,
     selfTestPollingMinutes :: PollingMinutes
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -188,16 +188,16 @@ instance ToJSON SelfTest where
 
 
 data Capabilities = Capabilities {
-    capabilitiesAttributeAutosaveEnabled :: Bool,
-    capabilitiesSelfTestsSupported :: Bool,
+    capabilitiesAttributeAutosaveEnabled      :: Bool,
+    capabilitiesSelfTestsSupported            :: Bool,
     capabilitiesExecOfflineImmediateSupported :: Bool,
-    capabilitiesConveyanceSelfTestSupported :: Bool,
-    capabilitiesOfflineIsAbortedUponNewCmd :: Bool,
-    capabilitiesErrorLoggingSupported :: Bool,
-    capabilitiesValues :: [Double],
-    capabilitiesGpLoggingSupported :: Bool,
-    capabilitiesOfflineSurfaceScanSupported :: Bool,
-    capabilitiesSelectiveSelfTestSupported :: Bool
+    capabilitiesConveyanceSelfTestSupported   :: Bool,
+    capabilitiesOfflineIsAbortedUponNewCmd    :: Bool,
+    capabilitiesErrorLoggingSupported         :: Bool,
+    capabilitiesValues                        :: [Double],
+    capabilitiesGpLoggingSupported            :: Bool,
+    capabilitiesOfflineSurfaceScanSupported   :: Bool,
+    capabilitiesSelectiveSelfTestSupported    :: Bool
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -213,8 +213,8 @@ instance ToJSON Capabilities where
 
 data AtaSmartData = AtaSmartData {
     ataSmartDataOfflineDataCollection :: OfflineDataCollection,
-    ataSmartDataSelfTest :: SelfTest,
-    ataSmartDataCapabilities :: Capabilities
+    ataSmartDataSelfTest              :: SelfTest,
+    ataSmartDataCapabilities          :: Capabilities
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -230,8 +230,8 @@ instance ToJSON AtaSmartData where
 
 data Device = Device {
     deviceProtocol :: Text,
-    deviceName :: Text,
-    deviceType :: Text,
+    deviceName     :: Text,
+    deviceType     :: Text,
     deviceInfoName :: Text
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -262,7 +262,7 @@ instance ToJSON PowerOnTime where
 
 
 data Standard = Standard {
-    standardCount :: Double,
+    standardCount    :: Double,
     standardRevision :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -294,9 +294,9 @@ instance ToJSON AtaSmartSelfTestLog where
 
 data AtaSctCapabilities = AtaSctCapabilities {
     ataSctCapabilitiesErrorRecoveryControlSupported :: Bool,
-    ataSctCapabilitiesValue :: Double,
-    ataSctCapabilitiesFeatureControlSupported :: Bool,
-    ataSctCapabilitiesDataTableSupported :: Bool
+    ataSctCapabilitiesValue                         :: Double,
+    ataSctCapabilitiesFeatureControlSupported       :: Bool,
+    ataSctCapabilitiesDataTableSupported            :: Bool
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -311,14 +311,14 @@ instance ToJSON AtaSctCapabilities where
 
 
 data Flags = Flags {
-    flagsPrefailure :: (Maybe (Bool:|:[(Maybe Value)])),
-    flagsString :: (Maybe (Text:|:[(Maybe Value)])),
-    flagsErrorRate :: (Maybe (Bool:|:[(Maybe Value)])),
-    flagsPerformance :: (Maybe (Bool:|:[(Maybe Value)])),
-    flagsEventCount :: (Maybe (Bool:|:[(Maybe Value)])),
-    flagsValue :: Double,
-    flagsAutoKeep :: (Maybe (Bool:|:[(Maybe Value)])),
-    flagsUpdatedOnline :: (Maybe (Bool:|:[(Maybe Value)])),
+    flagsPrefailure           :: (Maybe (Bool:|:[(Maybe Value)])),
+    flagsString               :: (Maybe (Text:|:[(Maybe Value)])),
+    flagsErrorRate            :: (Maybe (Bool:|:[(Maybe Value)])),
+    flagsPerformance          :: (Maybe (Bool:|:[(Maybe Value)])),
+    flagsEventCount           :: (Maybe (Bool:|:[(Maybe Value)])),
+    flagsValue                :: Double,
+    flagsAutoKeep             :: (Maybe (Bool:|:[(Maybe Value)])),
+    flagsUpdatedOnline        :: (Maybe (Bool:|:[(Maybe Value)])),
     flagsRemainderScanEnabled :: (Maybe (Bool:|:[(Maybe Value)]))
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -334,17 +334,17 @@ instance ToJSON Flags where
 
 
 data TableElt = TableElt {
-    tableEltRaw :: (Maybe (SataVersion:|:[(Maybe Value)])),
-    tableEltStatus :: (Maybe (Status:|:[(Maybe Value)])),
-    tableEltFlags :: (Maybe (Flags:|:[(Maybe Value)])),
-    tableEltLbaMin :: (Maybe (Double:|:[(Maybe Value)])),
-    tableEltWorst :: (Maybe (Double:|:[(Maybe Value)])),
-    tableEltValue :: (Maybe (Double:|:[(Maybe Value)])),
-    tableEltLbaMax :: (Maybe (Double:|:[(Maybe Value)])),
-    tableEltName :: (Maybe (Text:|:[(Maybe Value)])),
-    tableEltId :: (Maybe (Double:|:[(Maybe Value)])),
+    tableEltRaw        :: (Maybe (SataVersion:|:[(Maybe Value)])),
+    tableEltStatus     :: (Maybe (Status:|:[(Maybe Value)])),
+    tableEltFlags      :: (Maybe (Flags:|:[(Maybe Value)])),
+    tableEltLbaMin     :: (Maybe (Double:|:[(Maybe Value)])),
+    tableEltWorst      :: (Maybe (Double:|:[(Maybe Value)])),
+    tableEltValue      :: (Maybe (Double:|:[(Maybe Value)])),
+    tableEltLbaMax     :: (Maybe (Double:|:[(Maybe Value)])),
+    tableEltName       :: (Maybe (Text:|:[(Maybe Value)])),
+    tableEltId         :: (Maybe (Double:|:[(Maybe Value)])),
     tableEltWhenFailed :: (Maybe (Text:|:[(Maybe Value)])),
-    tableEltThresh :: (Maybe (Double:|:[(Maybe Value)]))
+    tableEltThresh     :: (Maybe (Double:|:[(Maybe Value)]))
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -359,10 +359,10 @@ instance ToJSON TableElt where
 
 
 data AtaSmartSelectiveSelfTestLog = AtaSmartSelectiveSelfTestLog {
-    ataSmartSelectiveSelfTestLogFlags :: Flags,
+    ataSmartSelectiveSelfTestLogFlags                    :: Flags,
     ataSmartSelectiveSelfTestLogPowerUpScanResumeMinutes :: Double,
-    ataSmartSelectiveSelfTestLogRevision :: Double,
-    ataSmartSelectiveSelfTestLogTable :: [TableElt]
+    ataSmartSelectiveSelfTestLogRevision                 :: Double,
+    ataSmartSelectiveSelfTestLogTable                    :: [TableElt]
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -393,7 +393,7 @@ instance ToJSON AtaSmartErrorLog where
 
 data AtaVersion = AtaVersion {
     ataVersionMajorValue :: Double,
-    ataVersionString :: Text,
+    ataVersionString     :: Text,
     ataVersionMinorValue :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -409,7 +409,7 @@ instance ToJSON AtaVersion where
 
 
 data Temperature = Temperature {
-    temperatureCurrent :: Double,
+    temperatureCurrent   :: Double,
     temperatureDriveTrip :: (Maybe (Double:|:[(Maybe Value)]))
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -426,7 +426,7 @@ instance ToJSON Temperature where
 
 data UserCapacity = UserCapacity {
     userCapacityBlocks :: Double,
-    userCapacityBytes :: Double
+    userCapacityBytes  :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -442,7 +442,7 @@ instance ToJSON UserCapacity where
 
 data AtaSmartAttributes = AtaSmartAttributes {
     ataSmartAttributesRevision :: Double,
-    ataSmartAttributesTable :: [TableElt]
+    ataSmartAttributesTable    :: [TableElt]
   } deriving (Show,Eq,GHC.Generics.Generic)
 
 
@@ -457,7 +457,7 @@ instance ToJSON AtaSmartAttributes where
 
 
 data MessagesElt = MessagesElt {
-    messagesEltString :: Text,
+    messagesEltString   :: Text,
     messagesEltSeverity :: Text
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -473,12 +473,12 @@ instance ToJSON MessagesElt where
 
 
 data Smartctl = Smartctl {
-    smartctlBuildInfo :: Text,
-    smartctlSvnRevision :: Text,
-    smartctlVersion :: [Double],
-    smartctlArgv :: [Text],
-    smartctlMessages :: (Maybe ([MessagesElt])),
-    smartctlExitStatus :: Double,
+    smartctlBuildInfo    :: Text,
+    smartctlSvnRevision  :: Text,
+    smartctlVersion      :: [Double],
+    smartctlArgv         :: [Text],
+    smartctlMessages     :: (Maybe ([MessagesElt])),
+    smartctlExitStatus   :: Double,
     smartctlPlatformInfo :: Text
   } deriving (Show,Eq,GHC.Generics.Generic)
 
@@ -495,7 +495,7 @@ instance ToJSON Smartctl where
 
 data Wwn = Wwn {
     wwnOui :: Double,
-    wwnId :: Double,
+    wwnId  :: Double,
     wwnNaa :: Double
   } deriving (Show,Eq,GHC.Generics.Generic)
 

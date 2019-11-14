@@ -1,5 +1,5 @@
-{-# LANGUAGE TypeOperators   #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeOperators   #-}
 
 module System.Smartmon.Parser
   ( getSmartInfo
@@ -27,26 +27,26 @@ data SmartInfo = SmartInfo
     _smDriveModel :: SmartValue T.Text,
     _smRotRate    :: SmartValue Int,
     _smDrvSerial  :: SmartValue T.Text
-  } deriving (Eq, Show)
+  } deriving (Eq)
 
 data SmartValue a = Unknown
                   | DecodeError
                   | SmartValue a
-                  deriving (Eq, Show)
+                  deriving (Eq)
 
 instance (Ord a,Num a) => Num (SmartValue a) where
 
   (+) (SmartValue x) (SmartValue y) = SmartValue $ x + y
-  (+) _ _ = Unknown
+  (+) _ _                           = Unknown
 
   (*) (SmartValue x) (SmartValue y) = SmartValue $ x * y
-  (*) _ _ = Unknown
+  (*) _ _                           = Unknown
 
   (-) (SmartValue x) (SmartValue y) = SmartValue $ x - y
-  (-) _ _ = Unknown
+  (-) _ _                           = Unknown
 
   abs (SmartValue x) = SmartValue $ abs x
-  abs _ = Unknown
+  abs _              = Unknown
 
   fromInteger = SmartValue . fromInteger
 

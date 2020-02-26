@@ -11,6 +11,7 @@
 module System.Smartmon.Datatypes
 where
 
+import           Data.Monoid                     ((<>))
 import           Control.Monad                   (join, mzero)
 import           Data.Aeson                      (FromJSON (..), ToJSON (..),
                                                   Value (..), object, pairs,

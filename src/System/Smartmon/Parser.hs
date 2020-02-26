@@ -27,12 +27,12 @@ data SmartInfo = SmartInfo
     _smDriveModel :: SmartValue T.Text,
     _smRotRate    :: SmartValue Int,
     _smDrvSerial  :: SmartValue T.Text
-  } deriving (Eq)
+  } deriving (Eq, Show)
 
 data SmartValue a = Unknown
                   | DecodeError
                   | SmartValue a
-                  deriving (Eq)
+                  deriving (Eq, Show)
 
 instance (Ord a,Num a) => Num (SmartValue a) where
 
